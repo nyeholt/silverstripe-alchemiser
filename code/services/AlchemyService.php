@@ -52,6 +52,70 @@ class AlchemyService
 		$this->api->setGlobalParam('outputMode', 'json');
 	}
 
+	/**
+	 * Updates a content item with data found by alchemy.
+	 *
+	 * Note that this does NOT save the object once finished. Callers must handle that themselves
+	 *
+	 * @param SiteTree $object
+	 */
+	public function alchemise($object) {
+		
+		$fields = $object->stat('extraction_fields');
+		if (!$fields) {
+			$fields = array('Title', 'Content');
+		}
+		$content = '';
+		foreach ($fields as $name) {
+			if ($object->hasField($name) && $object->isChanged($name)) {
+				$content .= ' ' . $object->$name;
+			}
+		}
+
+		// Need to have a reasonable amount of content before indexing...
+		if (strlen($content) < self::$char_limit) {
+			return;
+		}
+
+		$result = $this->getEntities($content);
+
+		if ($result->status == 'OK' && isset($result->entities) && count($result->entities)) {
+			foreach ($result->entities as $entity) {
+				$field = 'Alc'.$entity->type;
+				if (!$object->hasField($field)) {
+					ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
+					continue;
+				}
+				// make sure the field is empty because we're adding new data in
+				$object->$field = array();
+			}
+
+			foreach ($result->entities as $entity) {
+				$field = 'Alc'.$entity->type;
+				$relevance = $entity->relevance;
+				if ($relevance > 0.3) {
+					if (!$object->hasField($field)) {
+						ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
+						continue;
+					}
+					$cur = $object->$field->getValues();
+					$cur[] = $entity->text;
+					$object->$field = $cur;
+				}
+			}
+		}
+
+		$result = $this->getKeywords($content);
+
+		if ($result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
+			$keywords = array();
+			foreach ($result->keywords as $keyword) {
+				$keywords[] = $keyword->text;
+			}
+			$object->AlcKeywords = $keywords;
+		}
+	}
+
 	public function getEntities($content) {
 		return $this->call('getEntities', array('text' => $content));
 	}

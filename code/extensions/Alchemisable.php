@@ -76,60 +76,8 @@ class Alchemisable extends DataObjectDecorator {
 	}
 
 	public function onBeforeWrite() {
-		$fields = $this->owner->stat('extraction_fields');
-		if (!$fields) {
-			$fields = array('Title', 'Content');
-		}
-		$content = '';
-		foreach ($fields as $name) {
-			if ($this->owner->hasField($name) && $this->owner->isChanged($name)) {
-				$content .= ' ' . $this->owner->$name;
-			}
-		}
-
-		// Need to have a reasonable amount of content before indexing... 
-		if (strlen($content) < AlchemyService::$char_limit) {
-			return;
-		}
-
 		$alchemy = singleton('AlchemyService');
-		$result = $alchemy->getEntities($content);
-
-		if ($result->status == 'OK' && isset($result->entities) && count($result->entities)) {
-			foreach ($result->entities as $entity) {
-				$field = 'Alc'.$entity->type;
-				if (!$this->owner->hasField($field)) {
-					ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
-					continue;
-				}
-				// make sure the field is empty because we're adding new data in
-				$this->owner->$field = array();
-			}
-
-			foreach ($result->entities as $entity) {
-				$field = 'Alc'.$entity->type;
-				$relevance = $entity->relevance;
-				if ($relevance > 0.3) {
-					if (!$this->owner->hasField($field)) {
-						ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
-						continue;
-					}
-					$cur = $this->owner->$field->getValues();
-					$cur[] = $entity->text;
-					$this->owner->$field = $cur;
-				}
-			}
-		}
-
-		$result = $alchemy->getKeywords($content);
-
-		if ($result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
-			$keywords = array();
-			foreach ($result->keywords as $keyword) {
-				$keywords[] = $keyword->text;
-			}
-			$this->owner->AlcKeywords = $keywords;
-		}
+		$alchemy->alchemise($this->owner);
 	}
 }
 ?>
