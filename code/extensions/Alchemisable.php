@@ -60,7 +60,7 @@ class Alchemisable extends DataObjectDecorator {
 				'AlcStateOrCounty' => 'MultiValueField',
 				'AlcTechnology' => 'MultiValueField',
 				'AlcTelevisionShow' => 'MultiValueField',
-				'AlcTelevisionShow' => 'MultiValueField',
+				'AlcTelevisionStation' => 'MultiValueField',
 			),
 		);
 	}
@@ -76,8 +76,10 @@ class Alchemisable extends DataObjectDecorator {
 	}
 
 	public function onBeforeWrite() {
-		$alchemy = singleton('AlchemyService');
-		$alchemy->alchemise($this->owner);
+		if ($this->owner->ID) {
+			$alchemy = singleton('AlchemyService');
+			$alchemy->alchemise($this->owner);
+		}
 	}
 }
 ?>

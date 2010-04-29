@@ -34,7 +34,7 @@ class AlchemyService
 	 *
 	 * @var int
 	 */
-	public static $char_limit = 400;
+	public static $char_limit = 140;
 
 	public static $config = array(
 		'api_url' => 'http://access.alchemyapi.com',
@@ -59,7 +59,7 @@ class AlchemyService
 	 *
 	 * @param SiteTree $object
 	 */
-	public function alchemise($object) {
+	public function alchemise($object, $force=false) {
 		
 		$fields = $object->stat('extraction_fields');
 		if (!$fields) {
@@ -67,12 +67,15 @@ class AlchemyService
 		}
 		$content = '';
 		foreach ($fields as $name) {
-			if ($object->hasField($name) && $object->isChanged($name)) {
+			if ($object->hasField($name) && ($force || $object->isChanged($name))) {
 				$content .= ' ' . $object->$name;
 			}
 		}
 
-		// Need to have a reasonable amount of content before indexing...
+		// clean it up a bit - might need to be a bit more forceful with this. 
+		$content = strip_tags($content);
+
+		// Need to have a reasonable amount of content change before indexing...
 		if (strlen($content) < self::$char_limit) {
 			return;
 		}
@@ -83,7 +86,7 @@ class AlchemyService
 			foreach ($result->entities as $entity) {
 				$field = 'Alc'.$entity->type;
 				if (!$object->hasField($field)) {
-					ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
+					ssau_log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
 					continue;
 				}
 				// make sure the field is empty because we're adding new data in
@@ -95,7 +98,7 @@ class AlchemyService
 				$relevance = $entity->relevance;
 				if ($relevance > 0.3) {
 					if (!$object->hasField($field)) {
-						ssau_log("Alchemy returned field $field but it was not available", SS_Log::WARN);
+						ssau_log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
 						continue;
 					}
 					$cur = $object->$field->getValues();
@@ -107,12 +110,14 @@ class AlchemyService
 
 		$result = $this->getKeywords($content);
 
-		if ($result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
+		if ($result && $result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
 			$keywords = array();
 			foreach ($result->keywords as $keyword) {
 				$keywords[] = $keyword->text;
 			}
 			$object->AlcKeywords = $keywords;
+		} else {
+			ssau_log("There was an error getting keywords for $object->ID, result is ".var_export($result, true), SS_Log::ERR);
 		}
 	}
 

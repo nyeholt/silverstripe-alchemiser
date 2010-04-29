@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 /**
  * A simple helper function to deal with DB quoting.
  */
