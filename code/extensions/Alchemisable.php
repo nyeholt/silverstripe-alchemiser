@@ -65,6 +65,19 @@ class Alchemisable extends DataObjectDecorator {
 		);
 	}
 
+	/**
+	 * Add in some form fields for data returned from alchemy
+	 *
+	 * @param FieldSet $fields
+	 */
+	public function updateCMSFields($fields) {
+		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcKeywords', 'Keywords'));
+		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcPerson', 'People'));
+		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcCompany', 'Companies'));
+		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcOrganization', 'Organisations'));
+
+	}
+
 	public function updateSearchableFields(&$fields) {
 		$extras = $this->extraStatics();
 		foreach ($extras['db'] as $field => $type) {
