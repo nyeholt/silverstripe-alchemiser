@@ -34,7 +34,7 @@ class AlchemyService
 	 *
 	 * @var int
 	 */
-	public static $char_limit = 140;
+	public static $char_limit = 80;
 
 	public static $config = array(
 		'api_url' => 'http://access.alchemyapi.com',
@@ -80,9 +80,14 @@ class AlchemyService
 			return;
 		}
 
-		$result = $this->getEntities($content);
+		try {
+			usleep(500);
+			$result = $this->getEntities($content);
+		} catch (Exception $e) {
+			SS_Log::log($e, SS_Log::ERR);
+		}
 
-		if ($result->status == 'OK' && isset($result->entities) && count($result->entities)) {
+		if ($result && $result->status == 'OK' && isset($result->entities) && count($result->entities)) {
 			foreach ($result->entities as $entity) {
 				$field = 'Alc'.$entity->type;
 				if (!$object->hasField($field)) {
@@ -108,7 +113,12 @@ class AlchemyService
 			}
 		}
 
-		$result = $this->getKeywords($content);
+		try {
+			usleep(500);
+			$result = $this->getKeywords($content);
+		} catch (Exception $e) {
+			SS_Log::log($e, SS_Log::ERR);
+		}
 
 		if ($result && $result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
 			$keywords = array();
