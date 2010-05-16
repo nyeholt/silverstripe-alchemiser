@@ -80,6 +80,7 @@ class AlchemyService
 			return;
 		}
 
+		$result = null;
 		try {
 			usleep(500);
 			$result = $this->getEntities($content);
