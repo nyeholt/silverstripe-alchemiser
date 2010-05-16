@@ -92,7 +92,7 @@ class AlchemyService
 			foreach ($result->entities as $entity) {
 				$field = 'Alc'.$entity->type;
 				if (!$object->hasField($field)) {
-					ssau_log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
+					singleton('AlcUtils')->log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
 					continue;
 				}
 				// make sure the field is empty because we're adding new data in
@@ -104,7 +104,7 @@ class AlchemyService
 				$relevance = $entity->relevance;
 				if ($relevance > 0.3) {
 					if (!$object->hasField($field)) {
-						ssau_log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
+						singleton('AlcUtils')->log("Alchemy returned field $field but it was not available on object $object->ID", SS_Log::WARN);
 						continue;
 					}
 					$cur = $object->$field->getValues();
@@ -128,7 +128,7 @@ class AlchemyService
 			}
 			$object->AlcKeywords = $keywords;
 		} else {
-			ssau_log("There was an error getting keywords for $object->ID, result is ".var_export($result, true), SS_Log::ERR);
+			singleton('AlcUtils')->log("There was an error getting keywords for $object->ID, result is ".var_export($result, true), SS_Log::ERR);
 		}
 	}
 
