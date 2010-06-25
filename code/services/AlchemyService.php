@@ -147,7 +147,7 @@ class AlchemyService
 
 	public static $methods = array(
 		'getEntities' => array(
-			'method' => 'GET',
+			'method' => 'POST',
 			'url' => '/calls/text/TextGetRankedNamedEntities',
 			'params' => array('text'),
 			'cache' => 600,
@@ -155,7 +155,7 @@ class AlchemyService
 			// 'enctype' => Zend_Http_Client::ENC_FORMDATA,
 		),
 		'getCategory' => array(
-			'method' => 'GET',
+			'method' => 'POST',
 			'url' => '/calls/text/TextGetCategory',
 			'params' => array('text'),
 			'cache' => 600,
@@ -163,7 +163,7 @@ class AlchemyService
 		),
 		
 		'getKeywords' => array(
-			'method' => 'GET',
+			'method' => 'POST',
 			'url' => '/calls/text/TextGetRankedKeywords',
 			'params' => array('text'),
 			'cache' => 600,
