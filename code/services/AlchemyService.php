@@ -35,6 +35,13 @@ class AlchemyService
 	 * @var int
 	 */
 	public static $char_limit = 80;
+	
+	/**
+	 * How many keywords should we use?
+	 *
+	 * @var int
+	 */
+	public static $max_keywords = 15;
 
 	public static $config = array(
 		'api_url' => 'http://access.alchemyapi.com',
@@ -82,7 +89,6 @@ class AlchemyService
 
 		$result = null;
 		try {
-			usleep(500);
 			$result = $this->getEntities($content);
 		} catch (Exception $e) {
 			SS_Log::log($e, SS_Log::ERR);
@@ -123,7 +129,9 @@ class AlchemyService
 
 		if ($result && $result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
 			$keywords = array();
-			foreach ($result->keywords as $keyword) {
+			 
+			for ($i = 0, $c = count($result->keywords); $i < self::$max_keywords; $i++) {
+				$keyword = $result->keywords[$i];
 				$keywords[] = $keyword->text;
 			}
 			$object->AlcKeywords = $keywords;
