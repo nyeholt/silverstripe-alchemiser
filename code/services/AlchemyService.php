@@ -130,7 +130,7 @@ class AlchemyService
 		if ($result && $result->status == 'OK' && isset($result->keywords) && count($result->keywords)) {
 			$keywords = array();
 			 
-			for ($i = 0, $c = count($result->keywords); $i < self::$max_keywords; $i++) {
+			for ($i = 0, $c = count($result->keywords); $i < $c && $i < self::$max_keywords; $i++) {
 				$keyword = $result->keywords[$i];
 				$keywords[] = $keyword->text;
 			}
