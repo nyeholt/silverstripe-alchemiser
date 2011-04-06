@@ -71,11 +71,39 @@ class Alchemisable extends DataObjectDecorator {
 	 * @param FieldSet $fields
 	 */
 	public function updateCMSFields($fields) {
-		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcKeywords', 'Keywords'));
-		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcPerson', 'People'));
-		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcCompany', 'Companies'));
-		$fields->addFieldToTab('Root.Content.Keywords', new MultiValueTextField('AlcOrganization', 'Organisations'));
-
+		$fields->addFieldsToTab('Root.Alchemy', array(
+			new HeaderField('AlchemyMetadataHeader', 'Alchemy Metadata'),
+			new TextField('AlcCategory', 'Category'),
+			new MultiValueTextField('AlcKeywords', 'Keywords'),
+			new MultiValueTextField('AlcPerson', 'Person'),
+			new MultiValueTextField('AlcCompany', 'Companies'),
+			new MultiValueTextField('AlcOrganization', 'Organizations'),
+			new ToggleCompositeField('FurtherMetadata', 'Further Metadata', array(
+				new MultiValueTextField('AlcAnniversary', ''),
+				new MultiValueTextField('AlcCity', 'Cities'),
+				new MultiValueTextField('AlcContinent', 'Continents'),
+				new MultiValueTextField('AlcCountry', 'Countries'),
+				new MultiValueTextField('AlcEntertainmentAward', 'Entertainment awards'),
+				new MultiValueTextField('AlcFacility', 'Facilities'),
+				new MultiValueTextField('AlcFieldTerminology', 'Field terminologies'),
+				new MultiValueTextField('AlcFinancialMarketIndex', 'Financial market indexes'),
+				new MultiValueTextField('AlcGeographicFeature', 'Geographic features'),
+				new MultiValueTextField('AlcHealthCondition', 'Health conditions'),
+				new MultiValueTextField('AlcHoliday', 'Holidays'),
+				new MultiValueTextField('AlcMovie', 'Movies'),
+				new MultiValueTextField('AlcMusicGroup', 'Music groups'),
+				new MultiValueTextField('AlcNaturalDisaster', 'Natural disasters'),
+				new MultiValueTextField('AlcPrintMedia', 'Print media'),
+				new MultiValueTextField('AlcRadioProgram', 'Radio programs'),
+				new MultiValueTextField('AlcRadioStation', 'Radio stations'),
+				new MultiValueTextField('AlcRegion', 'Regions'),
+				new MultiValueTextField('AlcSport', 'Sports'),
+				new MultiValueTextField('AlcStateOrCounty', 'States or countries'),
+				new MultiValueTextField('AlcTechnology', 'Technology'),
+				new MultiValueTextField('AlcTelevisionShow', 'Television shows'),
+				new MultiValueTextField('AlcTelevisionStation', 'Television stations')
+			))
+		));
 	}
 
 	public function updateSearchableFields(&$fields) {
