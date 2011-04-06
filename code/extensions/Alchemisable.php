@@ -79,7 +79,7 @@ class Alchemisable extends DataObjectDecorator {
 			new MultiValueTextField('AlcCompany', 'Companies'),
 			new MultiValueTextField('AlcOrganization', 'Organizations'),
 			new ToggleCompositeField('FurtherMetadata', 'Further Metadata', array(
-				new MultiValueTextField('AlcAnniversary', ''),
+				new MultiValueTextField('AlcAnniversary', 'Anniversaries'),
 				new MultiValueTextField('AlcCity', 'Cities'),
 				new MultiValueTextField('AlcContinent', 'Continents'),
 				new MultiValueTextField('AlcCountry', 'Countries'),
