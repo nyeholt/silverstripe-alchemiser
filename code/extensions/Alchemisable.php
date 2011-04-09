@@ -27,42 +27,52 @@ OF SUCH DAMAGE.
  */
 class Alchemisable extends DataObjectDecorator {
 
-	public function extraStatics() {
+	/**
+	 * Returns a map of all the Alchemy entity DB fields to human-readable names.
+	 *
+	 * @return array
+	 */
+	public function entity_fields() {
 		return array(
-			'db' => array(
-				// category
-				'AlcCategory' => 'Varchar(128)',
-				// keywords
-				'AlcKeywords' => 'MultiValueField',
-				// now all the possible entities
-				'AlcAnniversary' => 'MultiValueField',
-				'AlcCity' => 'MultiValueField',
-				'AlcCompany' => 'MultiValueField',
-				'AlcContinent' => 'MultiValueField',
-				'AlcCountry' => 'MultiValueField',
-				'AlcEntertainmentAward' => 'MultiValueField',
-				'AlcFacility' => 'MultiValueField',
-				'AlcFieldTerminology' => 'MultiValueField',
-				'AlcFinancialMarketIndex' => 'MultiValueField',
-				'AlcGeographicFeature' => 'MultiValueField',
-				'AlcHealthCondition' => 'MultiValueField',
-				'AlcHoliday' => 'MultiValueField',
-				'AlcMovie' => 'MultiValueField',
-				'AlcMusicGroup' => 'MultiValueField',
-				'AlcNaturalDisaster' => 'MultiValueField',
-				'AlcOrganization' => 'MultiValueField',
-				'AlcPerson' => 'MultiValueField',
-				'AlcPrintMedia' => 'MultiValueField',
-				'AlcRadioProgram' => 'MultiValueField',
-				'AlcRadioStation' => 'MultiValueField',
-				'AlcRegion' => 'MultiValueField',
-				'AlcSport' => 'MultiValueField',
-				'AlcStateOrCounty' => 'MultiValueField',
-				'AlcTechnology' => 'MultiValueField',
-				'AlcTelevisionShow' => 'MultiValueField',
-				'AlcTelevisionStation' => 'MultiValueField',
-			),
+			'AlcAnniversary'          => 'Anniversaries',
+			'AlcCity'                 => 'Cities',
+			'AlcContinent'            => 'Continents',
+			'AlcCompany'              => 'Companies',
+			'AlcCountry'              => 'Countries',
+			'AlcEntertainmentAward'   => 'Entertainment awards',
+			'AlcFacility'             => 'Facilities',
+			'AlcFieldTerminology'     => 'Field terminologies',
+			'AlcFinancialMarketIndex' => 'Financial market indexes',
+			'AlcGeographicFeature'    => 'Geographic features',
+			'AlcHealthCondition'      => 'Health conditions',
+			'AlcHoliday'              => 'Holidays',
+			'AlcMovie'                => 'Movies',
+			'AlcMusicGroup'           => 'Music groups',
+			'AlcNaturalDisaster'      => 'Natural disasters',
+			'AlcOrganization'         => 'Organizations',
+			'AlcPerson'               => 'People',
+			'AlcPrintMedia'           => 'Print media',
+			'AlcRadioProgram'         => 'Radio programs',
+			'AlcRadioStation'         => 'Radio stations',
+			'AlcRegion'               => 'Regions',
+			'AlcSport'                => 'Sports',
+			'AlcStateOrCounty'        => 'States or countries',
+			'AlcTechnology'           => 'Technology',
+			'AlcTelevisionShow'       => 'Television shows',
+			'AlcTelevisionStation'    => 'Television stations'
 		);
+	}
+
+	public function extraStatics() {
+		$fields = array(
+			'AlcCategory' => 'Varchar(128)',
+			'AlcKeywords' => 'MultiValueField'
+		);
+
+		$entities = self::entity_fields();
+		$entities = array_fill_keys(array_keys($entities), 'MultiValueField');
+
+		return array('db' => array_merge($fields, $entities));
 	}
 
 	/**
@@ -71,6 +81,14 @@ class Alchemisable extends DataObjectDecorator {
 	 * @param FieldSet $fields
 	 */
 	public function updateCMSFields($fields) {
+		$entities = array();
+
+		foreach (self::entity_fields() as $field => $name) {
+			if (!in_array($field, array('AlcPerson', 'AlcCompany', 'AlcOrganization'))) {
+				$entities[] = new MultiValueTextField($field, $name);
+			}
+		}
+
 		$fields->addFieldsToTab('Root.Alchemy', array(
 			new HeaderField('AlchemyMetadataHeader', 'Alchemy Metadata'),
 			new TextField('AlcCategory', 'Category'),
@@ -78,31 +96,7 @@ class Alchemisable extends DataObjectDecorator {
 			new MultiValueTextField('AlcPerson', 'Person'),
 			new MultiValueTextField('AlcCompany', 'Companies'),
 			new MultiValueTextField('AlcOrganization', 'Organizations'),
-			new ToggleCompositeField('FurtherMetadata', 'Further Metadata', array(
-				new MultiValueTextField('AlcAnniversary', 'Anniversaries'),
-				new MultiValueTextField('AlcCity', 'Cities'),
-				new MultiValueTextField('AlcContinent', 'Continents'),
-				new MultiValueTextField('AlcCountry', 'Countries'),
-				new MultiValueTextField('AlcEntertainmentAward', 'Entertainment awards'),
-				new MultiValueTextField('AlcFacility', 'Facilities'),
-				new MultiValueTextField('AlcFieldTerminology', 'Field terminologies'),
-				new MultiValueTextField('AlcFinancialMarketIndex', 'Financial market indexes'),
-				new MultiValueTextField('AlcGeographicFeature', 'Geographic features'),
-				new MultiValueTextField('AlcHealthCondition', 'Health conditions'),
-				new MultiValueTextField('AlcHoliday', 'Holidays'),
-				new MultiValueTextField('AlcMovie', 'Movies'),
-				new MultiValueTextField('AlcMusicGroup', 'Music groups'),
-				new MultiValueTextField('AlcNaturalDisaster', 'Natural disasters'),
-				new MultiValueTextField('AlcPrintMedia', 'Print media'),
-				new MultiValueTextField('AlcRadioProgram', 'Radio programs'),
-				new MultiValueTextField('AlcRadioStation', 'Radio stations'),
-				new MultiValueTextField('AlcRegion', 'Regions'),
-				new MultiValueTextField('AlcSport', 'Sports'),
-				new MultiValueTextField('AlcStateOrCounty', 'States or countries'),
-				new MultiValueTextField('AlcTechnology', 'Technology'),
-				new MultiValueTextField('AlcTelevisionShow', 'Television shows'),
-				new MultiValueTextField('AlcTelevisionStation', 'Television stations')
-			))
+			new ToggleCompositeField('FurtherMetadata', 'Further Metadata', $entities)
 		));
 	}
 
