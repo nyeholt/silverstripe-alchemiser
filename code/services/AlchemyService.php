@@ -67,17 +67,16 @@ class AlchemyService {
 		));
 
 		$entities = $this->api->request('TextGetRankedNamedEntities');
-		$seen     = array();
 
 		if (!$entities->isError()) {
+			// First clear all existing entity data.
+			foreach (array_keys(Alchemisable::entity_fields()) as $field) {
+				$object->$field = array();
+			}
+
 			foreach ($entities->simpleXML()->entities->entity as $entity) {
 				$name      = "Alc{$entity->type}";
 				$relevance = $entity->relevance;
-
-				if (!array_key_exists($name, $seen)) {
-					$object->$name = array();
-					$seen[$name] = true;
-				}
 
 				if ($relevance > .3) {
 					$values = $object->$name->getValues();
