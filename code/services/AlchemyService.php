@@ -100,6 +100,11 @@ class AlchemyService {
 
 			$object->AlcKeywords = $extracted;
 		}
+
+		$category = $this->api->request('TextGetCategory');
+		if (!$category->isError()) {
+			$object->AlcCategory = (string) $category->simpleXML()->category;
+		}
 	}
 
 }
