@@ -34,11 +34,13 @@ class Alchemisable extends DataObjectDecorator {
 	 */
 	public function entity_fields() {
 		return array(
+			'AlcAutomobile'           => 'Automobiles',
 			'AlcAnniversary'          => 'Anniversaries',
 			'AlcCity'                 => 'Cities',
-			'AlcContinent'            => 'Continents',
 			'AlcCompany'              => 'Companies',
+			'AlcContinent'            => 'Continents',
 			'AlcCountry'              => 'Countries',
+			'AlcDrug'                 => 'Drugs',
 			'AlcEntertainmentAward'   => 'Entertainment awards',
 			'AlcFacility'             => 'Facilities',
 			'AlcFieldTerminology'     => 'Field terminologies',
@@ -49,6 +51,7 @@ class Alchemisable extends DataObjectDecorator {
 			'AlcMovie'                => 'Movies',
 			'AlcMusicGroup'           => 'Music groups',
 			'AlcNaturalDisaster'      => 'Natural disasters',
+			'OperatingSystem'         => 'Operating systems',
 			'AlcOrganization'         => 'Organizations',
 			'AlcPerson'               => 'People',
 			'AlcPrintMedia'           => 'Print media',
