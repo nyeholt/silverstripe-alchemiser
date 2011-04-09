@@ -123,4 +123,3 @@ class Alchemisable extends DataObjectDecorator {
 		}
 	}
 }
-?>

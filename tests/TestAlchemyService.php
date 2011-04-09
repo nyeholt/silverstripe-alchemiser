@@ -21,7 +21,7 @@ OF SUCH DAMAGE.
 */
 
 /**
- * 
+ *
  *
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  */
@@ -38,11 +38,9 @@ TEXT;
 		AlchemyService::set_api_key('');
 		AlchemyService::$methods['getEntities']['cache'] = 0;
 		$service = singleton('AlchemyService');
-		
+
 		$result = $service->getEntities($content);
 
 		print_r($result);
 	}
 }
-
-?>

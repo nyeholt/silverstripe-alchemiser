@@ -55,10 +55,10 @@ class AlchemiserReindexTask extends BuildTask
 			$pages = DataObject::get('Page');
 			throw new Exception("Specify ids as either a list of ids comma separated, or a single range of lo-hi");
 		}
-		
+
 		$alchemy = singleton('AlchemyService');
 
-		
+
 		/* @var $search SolrSearchService */
 		$count = 0;
 		foreach ($pages as $page) {
@@ -71,4 +71,3 @@ class AlchemiserReindexTask extends BuildTask
 		echo "Reindex complete, $count objects re-indexed<br/>";
 	}
 }
-?>

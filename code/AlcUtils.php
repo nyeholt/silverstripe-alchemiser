@@ -26,7 +26,7 @@ OF SUCH DAMAGE.
  */
 class AlcUtils {
 	public function __construct() {}
-	
+
 	/**
 	 * Quote up a filter of the form
 	 *
@@ -96,4 +96,3 @@ class AlcUtils {
 	}
 
 }
-?>
