@@ -7,13 +7,6 @@
 class AlchemyService {
 
 	/**
-	 * How many characters should content have before it is indexed?
-	 *
-	 * @var int
-	 */
-	public static $char_limit = 80;
-
-	/**
 	 * How many keywords should we use?
 	 *
 	 * @var int
@@ -42,41 +35,62 @@ class AlchemyService {
 	}
 
 	/**
-	 * Updates a content item with data from the Alchemy API.
-	 *
-	 * @param DataObject $object
+	 * @return string
 	 */
-	public function alchemise(DataObject $object) {
-		$content = $object->getAlchemyContent();
-
-		if (strlen($content) < self::$char_limit) {
-			return;
-		}
-
+	public function getCategoryFor($text) {
 		$this->api->setQueryString(array(
 			'apikey' => self::$config['api_key'],
-			'text'   => $content
+			'text'   => $text
 		));
 
-		$entities = $this->api->request('TextGetRankedNamedEntities');
+		$category = $this->api->request('TextGetCategory');
 
-		if (!$entities->isError()) {
-			// First clear all existing entity data.
-			foreach (array_keys(Alchemisable::entity_fields()) as $field) {
-				$object->$field = array();
-			}
+		if (!$category->isError()) {
+			return (string) $category->simpleXML()->category;
+		}
+	}
 
-			foreach ($entities->simpleXML()->entities->entity as $entity) {
-				$name      = "Alc{$entity->type}";
-				$relevance = $entity->relevance;
+	/**
+	 * @return array[]
+	 */
+	public function getEntitiesFor($text) {
+		$this->api->setQueryString(array(
+			'apikey' => self::$config['api_key'],
+			'text'   => $text
+		));
 
-				if ($relevance > .3) {
-					$values = $object->$name->getValues();
-					$values[] = (string) $entity->text;
-					$object->$name = $values;
+		$request = $this->api->request('TextGetRankedNamedEntities');
+
+		if (!$request->isError()) {
+			$entities = array();
+
+			foreach ($request->simpleXML()->entities->entity as $entity) {
+				if ($entity->relevance > .3) {
+					$type = (string) $entity->type;
+					$text = (string) $entity->text;
+
+					if (!array_key_exists($type, $entities)) {
+						$entities[$type] = array();
+					}
+
+					$entities[$type][] = $text;
 				}
 			}
+
+			return $entities;
+		} else {
+			return array();
 		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getKeywordsFor($text) {
+		$this->api->setQueryString(array(
+			'apikey' => self::$config['api_key'],
+			'text'   => $text
+		));
 
 		$keywords = $this->api->request('TextGetRankedKeywords');
 		$total    = 0;
@@ -90,12 +104,9 @@ class AlchemyService {
 				}
 			}
 
-			$object->AlcKeywords = $extracted;
-		}
-
-		$category = $this->api->request('TextGetCategory');
-		if (!$category->isError()) {
-			$object->AlcCategory = (string) $category->simpleXML()->category;
+			return $extracted;
+		} else {
+			return array();
 		}
 	}
 
