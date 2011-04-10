@@ -66,6 +66,27 @@ class Alchemisable extends DataObjectDecorator {
 		);
 	}
 
+	/**
+	 * Returns a plain text string which should be passed to Alchemy.
+	 *
+	 * @return string
+	 */
+	public function getAlchemyContent() {
+		$content = '';
+
+		if (!$fields = $this->owner->stat('extraction_fields')) {
+			$fields = array('Title', 'Content');
+		}
+
+		foreach ($fields as $field) {
+			if ($this->owner->hasField($field)) {
+				$content .= strip_tags($this->owner->$field) . ' ';
+			}
+		}
+
+		return $content;
+	}
+
 	public function extraStatics() {
 		$fields = array(
 			'AlcCategory' => 'Varchar(128)',

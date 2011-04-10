@@ -47,15 +47,7 @@ class AlchemyService {
 	 * @param DataObject $object
 	 */
 	public function alchemise(DataObject $object) {
-		$content = '';
-
-		if (!$fields = $object->stat('extraction_fields')) {
-			$fields = array('Title', 'Content');
-		}
-
-		foreach ($fields as $field) if ($object->hasField($field)) {
-			$content .= strip_tags($object->obj($field)->forTemplate()) . ' ';
-		}
+		$content = $object->getAlchemyContent();
 
 		if (strlen($content) < self::$char_limit) {
 			return;
