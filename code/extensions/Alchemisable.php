@@ -84,23 +84,7 @@ class Alchemisable extends DataObjectDecorator {
 	 * @param FieldSet $fields
 	 */
 	public function updateCMSFields($fields) {
-		$entities = array();
-
-		foreach (self::entity_fields() as $field => $name) {
-			if (!in_array($field, array('AlcPerson', 'AlcCompany', 'AlcOrganization'))) {
-				$entities[] = new MultiValueTextField($field, $name);
-			}
-		}
-
-		$fields->addFieldsToTab('Root.Alchemy', array(
-			new HeaderField('AlchemyMetadataHeader', 'Alchemy Metadata'),
-			new TextField('AlcCategory', 'Category'),
-			new MultiValueTextField('AlcKeywords', 'Keywords'),
-			new MultiValueTextField('AlcPerson', 'Person'),
-			new MultiValueTextField('AlcCompany', 'Companies'),
-			new MultiValueTextField('AlcOrganization', 'Organizations'),
-			new ToggleCompositeField('FurtherMetadata', 'Further Metadata', $entities)
-		));
+		$fields->addFieldToTab('Root.Alchemy', new AlchemyMetadataField($this, 'AlcMetadata'));
 	}
 
 	public function updateSearchableFields(&$fields) {
