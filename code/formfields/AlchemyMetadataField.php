@@ -47,6 +47,9 @@ class AlchemyMetadataField extends CompositeField {
 		$newCat = $service->getCategoryFor($content);
 
 		$oldKeys = $record->AlcKeywords->getValues();
+		if (!$oldKeys) {
+			$oldKeys = array();
+		}
 		$newKeys = $service->getKeywordsFor($content);
 		$addKeys = array_diff($newKeys, $oldKeys);
 		$rmKeys  = array_diff($oldKeys, $newKeys);
