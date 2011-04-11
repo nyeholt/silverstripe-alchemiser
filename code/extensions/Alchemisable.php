@@ -28,6 +28,11 @@ OF SUCH DAMAGE.
 class Alchemisable extends DataObjectDecorator {
 
 	/**
+	 * @var bool
+	 */
+	protected $automatic;
+
+	/**
 	 * Returns a map of all the Alchemy entity DB fields to human-readable names.
 	 *
 	 * @return array
@@ -64,6 +69,16 @@ class Alchemisable extends DataObjectDecorator {
 			'AlcTelevisionShow'       => 'Television shows',
 			'AlcTelevisionStation'    => 'Television stations'
 		);
+	}
+
+	/**
+	 * @param bool $automatic Specify whether values should be automatically
+	 *        extracted on save - defaults to FALSE and letting the user manually
+	 *        analyse the content.
+	 */
+	public function __construct($automatic = false) {
+		$this->automatic = $automatic;
+		parent::__construct();
 	}
 
 	/**
@@ -106,10 +121,13 @@ class Alchemisable extends DataObjectDecorator {
 	 */
 	public function updateCMSFields($fields) {
 		if ($this->owner->ID) {
-			$fields->addFieldToTab(
-				'Root.Alchemy',
-				new AlchemyMetadataField($this, 'AlcMetadata', 'Root.Alchemy.AlcMetadata')
-			);
+			$field = new AlchemyMetadataField($this, 'AlcMetadata', 'Root.Alchemy.AlcMetadata');
+
+			if ($this->automatic) {
+				$field = $field->performReadonlyTransformation();
+			}
+
+			$fields->addFieldToTab('Root.Alchemy', $field);
 		}
 	}
 
@@ -120,6 +138,12 @@ class Alchemisable extends DataObjectDecorator {
 				'title' => $field,
 				'filter' => 'PartialMatchFilter',
 			);
+		}
+	}
+
+	public function onBeforeWrite() {
+		if ($this->automatic) {
+			singleton('AlchemyService')->alchemise($this->owner);
 		}
 	}
 

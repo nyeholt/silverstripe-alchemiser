@@ -7,6 +7,13 @@
 class AlchemyService {
 
 	/**
+	 * How many characters should content have before it is indexed?
+	 *
+	  * @var int
+	*/
+	public static $char_limit = 80;
+
+	/**
 	 * How many keywords should we use?
 	 *
 	 * @var int
@@ -32,6 +39,39 @@ class AlchemyService {
 		$this->api = new RestfulService(Controller::join_links(
 			self::$config['api_url'], self::$config['api_path']
 		));
+	}
+
+	/**
+	 * Automatically extracts and replaces the category, keywords and entities
+	 * for a data object.
+	 *
+	 * @param DataObject $object
+	 */
+	public function alchemise(DataObject $object) {
+		if (!$object->hasExtension('Alchemisable')) {
+			throw new Exception('The object must have the Alchemisable extension.');
+		}
+
+		$text = $object->getAlchemyContent();
+
+		if (strlen($text) < self::$char_limit) {
+			return;
+		}
+
+		$object->AlcCategory = $this->getCategoryFor($text);
+		$object->AlcKeywords = $this->getKeywordsFor($text);
+
+		$entities = $this->getEntitiesFor($text);
+
+		foreach (Alchemisable::entity_fields() as $field => $name) {
+			$name = substr($field, 3);
+
+			if (array_key_exists($name, $entities)) {
+				$object->$field = $entities[$name];
+			} else {
+				$object->$field = array();
+			}
+		}
 	}
 
 	/**
