@@ -58,3 +58,5 @@ facets displayed
 
 
  */
+
+define('ALCHEMISER_DIR', 'alchemiser');

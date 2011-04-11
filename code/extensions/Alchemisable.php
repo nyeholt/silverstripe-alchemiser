@@ -105,7 +105,12 @@ class Alchemisable extends DataObjectDecorator {
 	 * @param FieldSet $fields
 	 */
 	public function updateCMSFields($fields) {
-		$fields->addFieldToTab('Root.Alchemy', new AlchemyMetadataField($this, 'AlcMetadata'));
+		if ($this->owner->ID) {
+			$fields->addFieldToTab(
+				'Root.Alchemy',
+				new AlchemyMetadataField($this, 'AlcMetadata', 'Root.Alchemy.AlcMetadata')
+			);
+		}
 	}
 
 	public function updateSearchableFields(&$fields) {
@@ -118,10 +123,4 @@ class Alchemisable extends DataObjectDecorator {
 		}
 	}
 
-	public function onBeforeWrite() {
-		if ($this->owner->ID) {
-			$alchemy = singleton('AlchemyService');
-			$alchemy->alchemise($this->owner);
-		}
-	}
 }

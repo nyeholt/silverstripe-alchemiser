@@ -1,0 +1,10 @@
+.alchemy-analyse p { font-size: 12px; margin-bottom: 5px; }
+.alchemy-analyse p em { font-size: 12px; }
+.alchemy-analyse h3 { font-size: 18px; margin: 8px 0 6px 0; }
+.alchemy-analyse h4 { font-size: 14px; margin: 12px 0 4px 0; }
+.alchemy-analyse h5 { font-size: 13px; margin-bottom: 8px; }
+.alchemy-analyse label, .alchemy-analyse li { font-size: 12px; }
+.alchemy-analyse .added, .alchemy-analyse .removed { width: 50%; }
+.alchemy-analyse .added { float: left; clear: left; }
+.alchemy-analyse .added-removed { overflow: auto; background: #F4F4F4; padding: 5px; margin-bottom: 5px; }
+.alchemy-analyse .removed { float: right; clear: right; }
