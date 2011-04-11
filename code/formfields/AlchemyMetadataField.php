@@ -78,6 +78,11 @@ class AlchemyMetadataField extends CompositeField {
 			$pos++;
 		}
 
+		// If there are no changes made, then return that to the user.
+		if ($oldCat == $newCat && !$addKeys && !$rmKeys && !count($entsChanged)) {
+			return '<p>There was no additional metadata extracted from the document.</p>';
+		}
+
 		$data = new ArrayData(array(
 			'CategoryChanged' => $oldCat != $newCat,
 			'OldCategory'     => $oldCat,
