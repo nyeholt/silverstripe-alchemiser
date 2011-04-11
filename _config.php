@@ -1,11 +1,7 @@
 <?php
-
-// Add the alchemisable extension
-// DataObject::add_extension('Page', 'Alchemisable');
-
-// and add the alchemiser key!
-// AlchemyService::set_api_key('');
-
+/**
+ * @package silverstripe-alchemiser
+ */
 
 /*
 If using in conjunction with Solr, use the following in your page to have
