@@ -34,7 +34,8 @@ class AlchemyMetadataField extends CompositeField {
 			new MultiValueTextField('AlcPerson', 'Person'),
 			new MultiValueTextField('AlcCompany', 'Companies'),
 			new MultiValueTextField('AlcOrganization', 'Organizations'),
-			new ToggleCompositeField('AlchemyFurtherMedata', 'Further Metadata', $entities)
+			new ToggleCompositeField('AlchemyFurtherMedata', 'Further Metadata', $entities),
+			new LiteralField('AlchemyLogo', '<a href="http://www.alchemyapi.com/" target="_blank" style="float: right"><img src="http://www.alchemyapi.com/images/alchemyAPI.jpg" /></a>')
 		));
 	}
 
