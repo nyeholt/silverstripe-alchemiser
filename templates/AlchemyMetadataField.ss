@@ -9,7 +9,7 @@
 		</p>
 		<p><a href="$Link(analyse)" class="alchemy-analyse">Analyze Content</a></p>
 	<% end_if %>
-	<% control Children %>
+	<% loop Children %>
 		$FieldHolder
-	<% end_control %>
+	<% end_loop %>
 </div>

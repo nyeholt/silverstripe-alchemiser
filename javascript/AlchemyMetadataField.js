@@ -1,10 +1,10 @@
 ;(function($) {
 	var applyMetadata = function() {
 		$("#alchemy-change-category:checked").each(function() {
-			$("#AlcCategory input").val($(this).attr("data-category"));
+			$("#AlchemyMetadata-Category input").val($(this).attr("data-category"));
 		});
 
-		var keywords = $("#AlcKeywords .mvtextfield");
+		var keywords = $("#AlchemyMetadata-Keywords .mvtextfield");
 
 		$("input.alchemy-add-keyword:checked").each(function() {
 			var keyword = $(this).attr("data-keyword");

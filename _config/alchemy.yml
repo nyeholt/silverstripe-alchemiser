@@ -1,0 +1,10 @@
+---
+Name: alchemy_config
+---
+Injector:
+  AlchemyAPI: 
+    properties:
+      key: add_your_own
+  AlchemyService:
+    properties:
+      alchemy: %$AlchemyAPI

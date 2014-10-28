@@ -22,12 +22,12 @@
 				<h5>Added Keywords</h5>
 				<% if KeywordsAdded %>
 					<ul>
-						<% control KeywordsAdded %>
+						<% loop KeywordsAdded %>
 							<li>
 								<input id="alchemy-add-keyword-$Pos" class="alchemy-add-keyword" data-keyword="$Name.ATT" type="checkbox" checked="checked" value="1">
 								<label for="alchemy-add-keyword-$Pos">$Name</label>
 							</li>
-						<% end_control %>
+						<% end_loop %>
 					</ul>
 				<% else %>
 					<p><em>No keywords added.</em></p>
@@ -38,12 +38,12 @@
 				<h5>Removed Keywords</h5>
 				<% if KeywordsRemoved %>
 					<ul>
-						<% control KeywordsRemoved %>
+						<% loop KeywordsRemoved %>
 							<li>
 								<input id="alchemy-rm-keyword-$Pos" class="alchemy-rm-keyword" data-keyword="$Name.ATT" type="checkbox" checked="checked" value="1">
 								<label for="alchemy-rm-keyword-$Pos">$Name</label>
 							</li>
-						<% end_control %>
+						<% end_loop %>
 					</ul>
 				<% else %>
 					<p><em>No keywords removed.</em></p>
@@ -56,18 +56,18 @@
 		<div class="entities">
 			<h3>Entities</h3>
 
-			<% control EntitiesChanged %>
+			<% loop EntitiesChanged %>
 				<div class="entity added-removed" data-field="$Name">
 					<div class="added">
 						<h5>Added $Title</h5>
 						<% if Added %>
 							<ul>
-								<% control Added %>
+								<% loop Added %>
 									<li>
 										<input id="alchemy-add-entity-$ParentPos-$Pos" class="alchemy-add-entity" data-entity="$Name" type="checkbox" checked="checked" value="1">
 										<label for="alchemy-add-entity-$ParentPos-$Pos">$Name</label>
 									</li>
-								<% end_control %>
+								<% end_loop %>
 							</ul>
 						<% else %>
 							<p><em>No $Title added.</em></p>
@@ -78,19 +78,19 @@
 						<h5>Removed $Title</h5>
 						<% if Removed %>
 							<ul>
-								<% control Removed %>
+								<% loop Removed %>
 									<li>
 										<input id="alchemy-rm-entity-$ParentPos-$Pos" class="alchemy-rm-entity" data-entity="$Name" type="checkbox" checked="checked" value="1">
 										<label for="alchemy-rm-entity-$ParentPos-$Pos">$Name</label>
 									</li>
-								<% end_control %>
+								<% end_loop %>
 							</ul>
 						<% else %>
 							<p><em>No $Title removed.</em></p>
 						<% end_if %>
 					</div>
 				</div>
-			<% end_control %>
+			<% end_loop %>
 		</div>
 	<% end_if %>
 </div>

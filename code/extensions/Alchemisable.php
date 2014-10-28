@@ -4,19 +4,23 @@
  *
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  */
-class Alchemisable extends DataObjectDecorator {
+class Alchemisable extends DataExtension {
+	
+	private static $db = array(
+		'AlchemyMetadata'		=> 'MultiValueField',
+	);
 
 	/**
 	 * @var bool
 	 */
-	protected $automatic;
+	public $automatic = false;
 
 	/**
 	 * Returns a map of all the Alchemy entity DB fields to human-readable names.
 	 *
 	 * @return array
 	 */
-	public function entity_fields() {
+	public static function entity_fields() {
 		return array(
 			'AlcAutomobile'           => 'Automobiles',
 			'AlcAnniversary'          => 'Anniversaries',
@@ -51,24 +55,16 @@ class Alchemisable extends DataObjectDecorator {
 	}
 
 	/**
-	 * @param bool $automatic Specify whether values should be automatically
-	 *        extracted on save - defaults to FALSE and letting the user manually
-	 *        analyse the content.
-	 */
-	public function __construct($automatic = false) {
-		$this->automatic = $automatic;
-		parent::__construct();
-	}
-
-	/**
 	 * Returns a plain text string which should be passed to Alchemy.
 	 *
 	 * @return string
 	 */
-	public function getAlchemyContent() {
+	public function getContentForAlchemy() {
 		$content = '';
 
-		if (!$fields = $this->owner->stat('extraction_fields')) {
+		$fields = $this->owner->config()->extraction_fields;
+		
+		if (!$fields) {
 			$fields = array('Title', 'Content');
 		}
 
@@ -80,17 +76,22 @@ class Alchemisable extends DataObjectDecorator {
 
 		return $content;
 	}
-
-	public function extraStatics() {
-		$fields = array(
-			'AlcCategory' => 'Varchar(128)',
-			'AlcKeywords' => 'MultiValueField'
-		);
-
-		$entities = self::entity_fields();
-		$entities = array_fill_keys(array_keys($entities), 'MultiValueField');
-
-		return array('db' => array_merge($fields, $entities));
+	
+	public function getAlchemyData() {
+		$data = $this->owner->AlchemyMetadata->getValues();
+		if (!$data) {
+			$data = array();
+		}
+		
+		if (!isset($data['Category'])) {
+			$data['Category'] = '';
+		}
+		
+		if (!isset($data['Keywords'])) {
+			$data['Keywords'] = array();
+		}
+		
+		return $data;
 	}
 
 	/**
@@ -98,32 +99,37 @@ class Alchemisable extends DataObjectDecorator {
 	 *
 	 * @param FieldSet $fields
 	 */
-	public function updateCMSFields($fields) {
+	public function updateCMSFields(\FieldList $fields) {
 		if ($this->owner->ID) {
-			$field = new AlchemyMetadataField($this, 'AlcMetadata', 'Root.Alchemy.AlcMetadata');
-
+			$field = new AlchemyMetadataField($this, 'AlchemyMetadata', 'Root.Alchemy.AlcMetadata');
 			if ($this->automatic) {
 				$field = $field->performReadonlyTransformation();
 			}
-
+			
+//			$data = $this->owner->AlchemyMetadata->getValues();
+//			if (!$data) {
+//				$data = array();
+//			}
+//
+//			$data = nl2br(str_replace("  ", "&nbsp;", json_encode($data, JSON_PRETTY_PRINT)));
+//			$field = LiteralField::create('AlchemyInfo', $data);
 			$fields->addFieldToTab('Root.Alchemy', $field);
 		}
 	}
 
-	public function updateSearchableFields(&$fields) {
-		$extras = $this->extraStatics();
-		foreach ($extras['db'] as $field => $type) {
-			$fields[$field] = array(
-				'title' => $field,
-				'filter' => 'PartialMatchFilter',
-			);
-		}
-	}
+//	public function updateSearchableFields(&$fields) {
+//		$extras = $this->extraStatics();
+//		foreach ($extras['db'] as $field => $type) {
+//			$fields[$field] = array(
+//				'title' => $field,
+//				'filter' => 'PartialMatchFilter',
+//			);
+//		}
+//	}
 
 	public function onBeforeWrite() {
 		if ($this->automatic) {
 			singleton('AlchemyService')->alchemise($this->owner);
 		}
 	}
-
 }
