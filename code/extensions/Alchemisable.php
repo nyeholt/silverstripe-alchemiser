@@ -9,11 +9,21 @@ class Alchemisable extends DataExtension {
 	private static $db = array(
 		'AlchemyMetadata'		=> 'MultiValueField',
 	);
-
+	
+	private static $stored_metadata = array(
+		'Keywords'	=> array(),
+		'Category'	=> '',
+		'Concepts'	=> array(),
+		'Entities'	=> array(),
+		'Taxonomy'	=> array()
+	);
+	
 	/**
 	 * @var bool
 	 */
 	public $automatic = false;
+	
+	
 
 	/**
 	 * Returns a map of all the Alchemy entity DB fields to human-readable names.
@@ -77,20 +87,25 @@ class Alchemisable extends DataExtension {
 		return $content;
 	}
 	
+	public function getDefaultAlchemyFields() {
+		$fields = Config::inst()->get($this->owner->class, 'stored_metadata');
+		return $fields;
+	}
+	
 	public function getAlchemyData() {
 		$data = $this->owner->AlchemyMetadata->getValues();
 		if (!$data) {
 			$data = array();
 		}
+
+		$fields = $this->getDefaultAlchemyFields();
 		
-		if (!isset($data['Category'])) {
-			$data['Category'] = '';
+		foreach ($fields as $fname => $default) {
+			if (!isset($data[$fname])) {
+				$data[$fname] = $default;
+			}
 		}
-		
-		if (!isset($data['Keywords'])) {
-			$data['Keywords'] = array();
-		}
-		
+
 		return $data;
 	}
 
@@ -113,7 +128,13 @@ class Alchemisable extends DataExtension {
 //
 //			$data = nl2br(str_replace("  ", "&nbsp;", json_encode($data, JSON_PRETTY_PRINT)));
 //			$field = LiteralField::create('AlchemyInfo', $data);
-			$fields->addFieldToTab('Root.Alchemy', $field);
+			
+			if ($rootTab = $fields->fieldByName('Root')) {
+				$fields->addFieldToTab('Root.Alchemy', $field); 
+			} else {
+				$fields->push($field);
+			}
+			
 		}
 	}
 

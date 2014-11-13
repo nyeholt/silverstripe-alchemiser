@@ -99,7 +99,6 @@ class AlchemyService {
 		
 		$entities = $this->alchemy->entities('text', $text); 
 		
-		
 		$items = array();
 
 		if (isset($entities['entities'])) {
@@ -165,6 +164,33 @@ class AlchemyService {
 			}
 		}
 		
+		return $words;
+	}
+	
+	public function getConceptsFor($text) {
+		$concepts = $this->alchemy->concepts('text', $text);
+		$words = array();
+		if (isset($concepts['concepts'])) {
+			$total = 0;
+			foreach ($concepts['concepts'] as $keyword) {
+				if ($total++ < $this->maxKeywords) {
+					$words[] = (string) $keyword['text'];
+				}
+			}
+		}
+		return $words;
+	}
+	
+	public function getTaxonomyFor($text) {
+		$taxonomy = $this->alchemy->taxonomy('text', $text);
+		
+		$words = array();
+		if (isset($taxonomy['taxonomy'])) {
+			$total = 0;
+			foreach ($taxonomy['taxonomy'] as $keyword) {
+				$words[] = (string) $keyword['label'];
+			}
+		}
 		return $words;
 	}
 }

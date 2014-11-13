@@ -27,18 +27,28 @@ class AlchemyMetadataField extends CompositeField {
 //			}
 //		}
 		
-		$data = $parent->getAlchemyData();
-
-		parent::__construct(array(
+		
+		
+		$fields = array(
 			new HeaderField('ExtactedMetadataHeader', 'Extracted Metadata'),
-			new TextField($name . '-Category', 'Category', $data['Category']),
-			new MultiValueTextField($name . '-Keywords', 'Keywords', $data['Keywords']),
+			
 //			new MultiValueTextField('AlchemyMetadata[Category]', 'Person'),
 //			new MultiValueTextField('AlcCompany', 'Companies'),
 //			new MultiValueTextField('AlcOrganization', 'Organizations'),
 //			new ToggleCompositeField('AlchemyFurtherMedata', 'Further Metadata', $entities),
-			new LiteralField('AlchemyLogo', '<a href="http://www.alchemyapi.com/" target="_blank" style="float: right"><img src="http://www.alchemyapi.com/images/alchemyAPI.jpg" /></a>')
-		));
+			
+		);
+		
+		$alcFields = $parent->getDefaultAlchemyFields();
+		$data = $parent->getAlchemyData();
+		
+		foreach ($alcFields as $fname => $default) {
+			$type = is_array($default) ? 'MultiValueTextField' : 'TextField';
+			$fields[] = new $type($name . '-' . $fname, $fname, $data[$fname]);
+		}
+		$fields[] = new LiteralField('AlchemyLogo', '<a href="http://www.alchemyapi.com/" target="_blank" style="float: right"><img src="http://www.alchemyapi.com/images/alchemyAPI.jpg" /></a>');
+
+		parent::__construct($fields);
 	}
 
 	public function analyse() {
@@ -50,7 +60,7 @@ class AlchemyMetadataField extends CompositeField {
 		if (!$data) {
 			$data = array();
 		}
-
+		
 		$oldCat = isset($data['Category']) ? $data['Category'] : '';
 		$newCat = $service->getCategoryFor($content);
 
@@ -59,12 +69,17 @@ class AlchemyMetadataField extends CompositeField {
 			$oldKeys = array();
 		}
 		$newKeys = $service->getKeywordsFor($content);
+		
 
 		$addKeys = array_diff($newKeys, $oldKeys);
 		$rmKeys  = array_diff($oldKeys, $newKeys);
 
 		sort($addKeys);
 		sort($rmKeys);
+		
+		$concepts = $service->getConceptsFor($content);
+		
+		$taxonomy = $service->getTaxonomyFor($content);
 
 //		$entities    = $service->getEntitiesFor($content);
 //		$entsChanged = new DataObjectSet();
@@ -133,8 +148,10 @@ class AlchemyMetadataField extends CompositeField {
 		parent::saveInto($record);
 		$data = $record->getAlchemyData();
 		
-		$data['Category'] = $this->children->dataFieldByName($this->name . '-Category')->Value();
-		$data['Keywords'] = $this->children->dataFieldByName($this->name . '-Keywords')->Value();
+		$fields = $record->getDefaultAlchemyFields();
+		foreach ($fields as $name => $default) {
+			$data[$name] = $this->children->dataFieldByName($this->name . '-' . $name)->Value();
+		}
 		
 		$record->AlchemyMetadata = $data;
 	}
