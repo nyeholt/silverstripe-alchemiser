@@ -132,4 +132,25 @@ class Alchemisable extends DataExtension {
 			singleton('AlchemyService')->alchemise($this->owner);
 		}
 	}
+	
+	public function additionalSolrValues() {
+		$data = $this->getAlchemyData();
+		$alc = array();
+		foreach ($data as $field => $val) {
+			$alc[$field] = $val;
+		}
+		return $alc;
+	}
+	
+	public function getSolrSearchableFields() {
+		$fields = $this->owner->searchableFields();
+		if (!isset($fields['Category'])) {
+			$fields['Category'] = array('filter' => 'PartialMatchFilter', 'title' => 'Category');
+		}
+		if (!isset($fields['Keywords'])) {
+			$fields['Keywords'] = array('filter' => 'PartialMatchFilter', 'title' => 'Keywords');
+		}
+		
+		return $fields;
+	}
 }
