@@ -165,11 +165,13 @@ class Alchemisable extends DataExtension {
 	
 	public function getSolrSearchableFields() {
 		$fields = $this->owner->searchableFields();
-		if (!isset($fields['Category'])) {
-			$fields['Category'] = array('filter' => 'PartialMatchFilter', 'title' => 'Category');
-		}
-		if (!isset($fields['Keywords'])) {
-			$fields['Keywords'] = array('filter' => 'PartialMatchFilter', 'title' => 'Keywords');
+		
+		$configed = Config::inst()->get('Alchemisable', 'stored_metadata');
+		
+		if (is_array($configed)) {
+			foreach ($configed as $name => $default) {
+				$fields[$name] = array('filter' => 'PartialMatchFilter', 'title' => $name);
+			}
 		}
 		
 		return $fields;
