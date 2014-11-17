@@ -100,6 +100,8 @@ class AlchemyService {
 		$entities = $this->alchemy->entities('text', $text); 
 		
 		$items = array();
+		
+		$words = array();
 
 		if (isset($entities['entities'])) {
 			foreach ($entities['entities'] as $entity) {
@@ -112,11 +114,12 @@ class AlchemyService {
 					}
 
 					$items[$type][] = $text;
+					$words[] = $text;
 				}
 			}
 		}
 		
-		return $items;
+		return $words;
 		
 //		$this->api->setQueryString(array(
 //			'apikey' => self::$config['api_key'],
