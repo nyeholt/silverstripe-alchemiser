@@ -1,5 +1,37 @@
 ;(function($) {
 	var applyMetadata = function() {
+		var container = $(this);
+		
+		$('div.field.alchemy-populated').each (function () {
+			var $this = $(this);
+			var fieldName = $this.attr('id').replace(/AlchemyMetadata-/, '');
+			
+			if ($this.hasClass('multivaluetext')) {
+
+				var dataField = $("#AlchemyMetadata-" + fieldName + " .mvtextfield");
+
+				$("input.alchemy-add-" + fieldName + ":checked").each(function() {
+					var word = $(this).attr("data-" + fieldName);
+					var last    = dataField.last().parent();
+					last.clone().prependTo(last.parent()).find('input').val(word);
+				});
+
+				$("input.alchemy-rm-" + fieldName + ":checked").each(function() {
+					var word = $(this).attr("data-" + fieldName);
+					dataField.filter(function() { return $(this).val() == word; }).remove();
+				});
+			} else {
+				// find checkbox, see if checked, set val if so
+				if ($('#alchemy-change-' + fieldName + ':checked').length > 0) {
+					$(this).find('input').val($('#alchemy-change-' + fieldName + ':checked').attr('data-' + fieldName));
+				}
+			}
+		})
+		
+		$(this).dialog("close");
+		
+		return;
+		
 		$("#alchemy-change-category:checked").each(function() {
 			$("#AlchemyMetadata-Category input").val($(this).attr("data-category"));
 		});
@@ -31,7 +63,7 @@
 			vals.filter(function() { return $(this).val() == val; }).remove();
 		});
 
-		$(this).dialog("close");
+		
 	};
 
 	$("a.alchemy-analyse").live("click", function() {

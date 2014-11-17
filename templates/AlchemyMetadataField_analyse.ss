@@ -6,91 +6,50 @@
 		applied metadata.
 	</p>
 
-	<% if CategoryChanged %>
-		<h3>Category</h3>
-		<p>
-			<input id="alchemy-change-category" type="checkbox" checked="checked" value="1" data-category="$NewCategory.ATT">
-			<label for="alchemy-change-category">Change the category from "$OldCategory" to "$NewCategory".</label>
-		</p>
-	<% end_if %>
+	<% loop Changes %>
 
-	<% if KeywordsChanged %>
-		<h3>Keywords</h3>
+		<% if Type == 'array' %>
+		<h3>$Title</h3>
 
-		<div class="keywords added-removed">
+		<div class="$Title added-removed">
+			<% if $AddInfo %>
 			<div class="added">
-				<h5>Added Keywords</h5>
-				<% if KeywordsAdded %>
-					<ul>
-						<% loop KeywordsAdded %>
-							<li>
-								<input id="alchemy-add-keyword-$Pos" class="alchemy-add-keyword" data-keyword="$Name.ATT" type="checkbox" checked="checked" value="1">
-								<label for="alchemy-add-keyword-$Pos">$Name</label>
-							</li>
-						<% end_loop %>
-					</ul>
-				<% else %>
-					<p><em>No keywords added.</em></p>
-				<% end_if %>
+				<h5>Added $Title</h5>
+				<ul>
+					<% loop $AddInfo %>
+						<li>
+							<input id="alchemy-add-$Up.Title-$Pos" class="alchemy-add-$Up.Title" data-$Up.Title="$Name.ATT" type="checkbox" checked="checked" value="1">
+							<label for="alchemy-add-$Up.Title-$Pos">$Name</label>
+						</li>
+					<% end_loop %>
+				</ul>
 			</div>
+			<% end_if %>
 
+			<% if $RemoveInfo %>
 			<div class="removed">
-				<h5>Removed Keywords</h5>
-				<% if KeywordsRemoved %>
+				<h5>Removed $Title</h5>
 					<ul>
-						<% loop KeywordsRemoved %>
+						<% loop $RemoveInfo %>
 							<li>
-								<input id="alchemy-rm-keyword-$Pos" class="alchemy-rm-keyword" data-keyword="$Name.ATT" type="checkbox" checked="checked" value="1">
-								<label for="alchemy-rm-keyword-$Pos">$Name</label>
+								<input id="alchemy-rm-$Up.Title-$Pos" class="alchemy-rm-$Up.Title" data-$Up.Title="$Name.ATT" type="checkbox" checked="checked" value="1">
+								<label for="alchemy-rm-$Up.Title-$Pos">$Name</label>
 							</li>
 						<% end_loop %>
 					</ul>
-				<% else %>
-					<p><em>No keywords removed.</em></p>
-				<% end_if %>
+				
 			</div>
+			<% end_if %>
 		</div>
-	<% end_if %>
+		
+		<% else %>
+		
+		<h3>$Title</h3>
+		<p>
+			<input id="alchemy-change-$Title" type="checkbox" checked="checked" value="1" data-$Title="$AddInfo.ATT">
+			<label for="alchemy-change-$Title">Change $Title from "$RemoveInfo" to "$AddInfo".</label>
+		</p>
+		<% end_if %>
 
-	<% if EntitiesChanged %>
-		<div class="entities">
-			<h3>Entities</h3>
-
-			<% loop EntitiesChanged %>
-				<div class="entity added-removed" data-field="$Name">
-					<div class="added">
-						<h5>Added $Title</h5>
-						<% if Added %>
-							<ul>
-								<% loop Added %>
-									<li>
-										<input id="alchemy-add-entity-$ParentPos-$Pos" class="alchemy-add-entity" data-entity="$Name" type="checkbox" checked="checked" value="1">
-										<label for="alchemy-add-entity-$ParentPos-$Pos">$Name</label>
-									</li>
-								<% end_loop %>
-							</ul>
-						<% else %>
-							<p><em>No $Title added.</em></p>
-						<% end_if %>
-					</div>
-
-					<div class="removed">
-						<h5>Removed $Title</h5>
-						<% if Removed %>
-							<ul>
-								<% loop Removed %>
-									<li>
-										<input id="alchemy-rm-entity-$ParentPos-$Pos" class="alchemy-rm-entity" data-entity="$Name" type="checkbox" checked="checked" value="1">
-										<label for="alchemy-rm-entity-$ParentPos-$Pos">$Name</label>
-									</li>
-								<% end_loop %>
-							</ul>
-						<% else %>
-							<p><em>No $Title removed.</em></p>
-						<% end_if %>
-					</div>
-				</div>
-			<% end_loop %>
-		</div>
-	<% end_if %>
+	<% end_loop %>
 </div>

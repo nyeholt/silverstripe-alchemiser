@@ -44,7 +44,9 @@ class AlchemyMetadataField extends CompositeField {
 		
 		foreach ($alcFields as $fname => $default) {
 			$type = is_array($default) ? 'MultiValueTextField' : 'TextField';
-			$fields[] = new $type($name . '-' . $fname, $fname, $data[$fname]);
+			$field = new $type($name . '-' . $fname, $fname, $data[$fname]);
+			$field->addExtraClass('alchemy-populated');
+			$fields[] = $field;
 		}
 		$fields[] = new LiteralField('AlchemyLogo', '<a href="http://www.alchemyapi.com/" target="_blank" style="float: right"><img src="http://www.alchemyapi.com/images/alchemyAPI.jpg" /></a>');
 
@@ -61,25 +63,59 @@ class AlchemyMetadataField extends CompositeField {
 			$data = array();
 		}
 		
-		$oldCat = isset($data['Category']) ? $data['Category'] : '';
-		$newCat = $service->getCategoryFor($content);
+		$properties = Config::inst()->get('Alchemisable', 'stored_metadata');
+		
+		$changes = ArrayList::create();
+		
+		foreach ($properties as $prop => $def) {
+			$method = "get{$prop}For";
+			
+			$oldData = isset($data[$prop]) ? $data[$prop] : $def;
+			$newData = $def;
+			
+			if (method_exists($service, $method)) {
+				$newData = $service->$method($content);
+			} else {
+				continue;
+			}
+			
+			$info = ArrayData::create(array(
+				'Title'		=> $prop,
+			));
+			// see whether we're expecting array/string data, and store appropriate diff
+			if (is_array($def)) {
+				$addItems = array_diff($newData, $oldData);
+				$rmItems  = array_diff($oldData, $newData);
 
-		$oldKeys = isset($data['Keywords']) ? $data['Keywords'] : '';
-		if (!$oldKeys) {
-			$oldKeys = array();
+				sort($addItems);
+				sort($rmItems);
+				
+				if (count($addItems) || count($rmItems)) {
+					$info->AddInfo = $this->arrToSet($addItems);
+					$info->RemoveInfo = $this->arrToSet($rmItems);
+					$info->Type = 'array';
+					$changes->push($info);
+				}
+				
+			} else if ($oldData != $newData) {
+				$info->RemoveInfo = $oldData;
+				$info->AddInfo = $newData;
+				$info->Type = 'field';
+				$changes->push($info);
+			}
 		}
-		$newKeys = $service->getKeywordsFor($content);
 		
-
-		$addKeys = array_diff($newKeys, $oldKeys);
-		$rmKeys  = array_diff($oldKeys, $newKeys);
-
-		sort($addKeys);
-		sort($rmKeys);
-		
-		$concepts = $service->getConceptsFor($content);
-		
-		$taxonomy = $service->getTaxonomyFor($content);
+//		$oldCat = isset($data['Category']) ? $data['Category'] : '';
+//		$newCat = $service->getCategoryFor($content);
+//
+//		$oldKeys = isset($data['Keywords']) ? $data['Keywords'] : '';
+//		if (!$oldKeys) {
+//			$oldKeys = array();
+//		}
+//
+//		$concepts = $service->getConceptsFor($content);
+//		
+//		$taxonomy = $service->getTaxonomyFor($content);
 
 //		$entities    = $service->getEntitiesFor($content);
 //		$entsChanged = new DataObjectSet();
@@ -105,19 +141,22 @@ class AlchemyMetadataField extends CompositeField {
 //			$pos++;
 //		}
 
-		// If there are no changes made, then return that to the user.
-		if ($oldCat == $newCat && !$addKeys && !$rmKeys) { // && !count($entsChanged)) {
-			return '<p>There was no additional metadata extracted from the document.</p>';
-		}
-
+//		// If there are no changes made, then return that to the user.
+//		if ($oldCat == $newCat && !$addKeys && !$rmKeys) { // && !count($entsChanged)) {
+//			return '<p>There was no additional metadata extracted from the document.</p>';
+//		}
+//
+//		$data = new ArrayData(array(
+//			'CategoryChanged' => $oldCat != $newCat,
+//			'OldCategory'     => $oldCat,
+//			'NewCategory'     => $newCat,
+//			'KeywordsChanged' => $addKeys || $rmKeys,
+//			'KeywordsAdded'   => $this->arrToSet($addKeys),
+//			'KeywordsRemoved' => $this->arrToSet($rmKeys),
+////			'EntitiesChanged' => $entsChanged
+//		));
 		$data = new ArrayData(array(
-			'CategoryChanged' => $oldCat != $newCat,
-			'OldCategory'     => $oldCat,
-			'NewCategory'     => $newCat,
-			'KeywordsChanged' => $addKeys || $rmKeys,
-			'KeywordsAdded'   => $this->arrToSet($addKeys),
-			'KeywordsRemoved' => $this->arrToSet($rmKeys),
-//			'EntitiesChanged' => $entsChanged
+			'Changes' => $changes
 		));
 		return $data->renderWith('AlchemyMetadataField_analyse');
 	}
