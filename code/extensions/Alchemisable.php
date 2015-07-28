@@ -22,8 +22,6 @@ class Alchemisable extends DataExtension {
 	 * @var bool
 	 */
 	public $automatic = false;
-	
-	
 
 	/**
 	 * Returns a map of all the Alchemy entity DB fields to human-readable names.
@@ -105,7 +103,6 @@ class Alchemisable extends DataExtension {
 				$data[$fname] = $default;
 			}
 		}
-
 		return $data;
 	}
 
@@ -163,9 +160,7 @@ class Alchemisable extends DataExtension {
 		return $alc;
 	}
 	
-	public function getSolrSearchableFields() {
-		$fields = $this->owner->searchableFields();
-		
+	public function updateSolrSearchableFields(&$fields) {
 		$configed = Config::inst()->get('Alchemisable', 'stored_metadata');
 		
 		if (is_array($configed)) {
@@ -173,7 +168,5 @@ class Alchemisable extends DataExtension {
 				$fields[$name] = array('filter' => 'PartialMatchFilter', 'title' => $name);
 			}
 		}
-		
-		return $fields;
 	}
 }
